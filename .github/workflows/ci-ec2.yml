@@ -1,0 +1,26 @@
+name: CI - EC2 Self Hosted
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  test-on-ec2:
+    runs-on: [self-hosted, ec2]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Prove this is the EC2 machine
+        run: |
+          echo "Hostname:"
+          hostname
+          echo "IP address:"
+          hostname -I
+
+      - name: Install dependencies
+        run: pip3 install pytest
+
+      - name: Run tests
+        run: pytest -v
