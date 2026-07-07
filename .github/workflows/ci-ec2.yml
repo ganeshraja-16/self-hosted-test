@@ -2,25 +2,42 @@ name: CI - EC2 Self Hosted
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
   test-on-ec2:
-    runs-on: [self-hosted, ec2]
+    runs-on:
+      - self-hosted
+      - ec2
+
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Prove this is the EC2 machine
+      - name: Display EC2 information
         run: |
           echo "Hostname:"
           hostname
-          echo "IP address:"
+          echo ""
+          echo "IP Address:"
           hostname -I
+          echo ""
+          echo "Python Version:"
+          python3 --version
+
+      - name: Create Python virtual environment
+        run: |
+          python3 -m venv .venv
 
       - name: Install dependencies
-        run: pip3 install pytest
+        run: |
+          source .venv/bin/activate
+          python -m pip install --upgrade pip
+          pip install pytest
 
-      - name: Run tests
-        run: pytest -v
+      - name: Run unit tests
+        run: |
+          source .venv/bin/activate
+          pytest -v
